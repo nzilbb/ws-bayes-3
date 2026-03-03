@@ -292,7 +292,7 @@ Joshua Wilson Black <a href="https://orcid.org/0000-0002-8272-5763" class="quart
 <li class="fragment">Practical tests of priors:
 <ul>
 <li class="fragment">Convince yourself that it’s compatible with any plausible outcome (via a <span class="red">prior predictive test</span>).</li>
-<li class="fragment">Check how much your choice influences your result (via a <span class="red">prior predictive test</span>).</li>
+<li class="fragment">Check how much your choice influences your result (via a <span class="red">sensitivity analysis</span>).</li>
 </ul></li>
 <li class="fragment">A terminological niggle: you can change your prior, <strong>after</strong> you see your data!</li>
 </ul>
@@ -554,7 +554,7 @@ schoolStMargaretsCollege 0.4728209 0.05449568 0.3684790 0.5798067</code></pre>
 <li class="fragment">If you do decide to use the default, put it in your code explicitly.
 <ul>
 <li class="fragment">i.e., not ‘we used the default prior’,</li>
-<li class="fragment">rather, ‘use used an uninformative prior for all coefficients, with a weakly informative [etc.]’</li>
+<li class="fragment">rather, ‘we used an uninformative prior for all coefficients, with a weakly informative [etc.]’</li>
 </ul></li>
 </ul>
 </section></section>
@@ -598,14 +598,23 @@ schoolStMargaretsCollege 0.4728209 0.05449568 0.3684790 0.5798067</code></pre>
 <section id="plotting" class="slide level2">
 <h2>Plotting</h2>
 <div class="fragment">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href=""></a>prior_draws <span class="sc">|&gt;</span> </span>
-<span id="cb13-2"><a href=""></a>  <span class="fu">ggplot</span>(</span>
-<span id="cb13-3"><a href=""></a>    <span class="fu">aes</span>(</span>
-<span id="cb13-4"><a href=""></a>      <span class="at">x =</span> school,</span>
-<span id="cb13-5"><a href=""></a>      <span class="at">y =</span> .prediction</span>
-<span id="cb13-6"><a href=""></a>    )</span>
-<span id="cb13-7"><a href=""></a>  ) <span class="sc">+</span></span>
-<span id="cb13-8"><a href=""></a>  <span class="fu">geom_boxplot</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href=""></a>draws_to_plot <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>, <span class="at">size =</span> <span class="dv">4</span>)</span>
+<span id="cb13-2"><a href=""></a>prior_draws <span class="sc">|&gt;</span> </span>
+<span id="cb13-3"><a href=""></a>  <span class="fu">filter</span>(</span>
+<span id="cb13-4"><a href=""></a>    .draw <span class="sc">%in%</span> draws_to_plot</span>
+<span id="cb13-5"><a href=""></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb13-6"><a href=""></a>  <span class="fu">ggplot</span>(</span>
+<span id="cb13-7"><a href=""></a>    <span class="fu">aes</span>(</span>
+<span id="cb13-8"><a href=""></a>      <span class="at">x =</span> school,</span>
+<span id="cb13-9"><a href=""></a>      <span class="at">y =</span> .prediction</span>
+<span id="cb13-10"><a href=""></a>    )</span>
+<span id="cb13-11"><a href=""></a>  ) <span class="sc">+</span></span>
+<span id="cb13-12"><a href=""></a>  <span class="fu">geom_violin</span>(</span>
+<span id="cb13-13"><a href=""></a>    <span class="at">quantiles =</span> <span class="fu">c</span>(<span class="fl">0.5</span>),</span>
+<span id="cb13-14"><a href=""></a>    <span class="at">quantile.linetype =</span> <span class="st">"dashed"</span>,</span>
+<span id="cb13-15"><a href=""></a>    <span class="at">quantile.linewidth =</span> <span class="dv">1</span></span>
+<span id="cb13-16"><a href=""></a>  ) <span class="sc">+</span></span>
+<span id="cb13-17"><a href=""></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(.draw))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="plotting-cont.-2" class="slide level2 smaller">

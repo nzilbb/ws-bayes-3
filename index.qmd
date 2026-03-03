@@ -128,7 +128,7 @@ In practice, you can ignore $p(e)$.
     - Convince yourself that it's compatible with any plausible outcome 
     (via a [prior predictive test]{.red}).
     - Check how much your choice influences your result 
-    (via a [prior predictive test]{.red}).
+    (via a [sensitivity analysis]{.red}).
 - A terminological niggle: you can change your prior, **after** you see your data!
 
 ## Probability distributions...
@@ -384,7 +384,7 @@ Explicitly specify your prior!
 - Don't use the default without thinking
 - If you do decide to use the default, put it in your code explicitly.
     - i.e., not 'we used the default prior',
-    - rather, 'use used an uninformative prior for all coefficients, with a weakly informative [etc.]' 
+    - rather, 'we used an uninformative prior for all coefficients, with a weakly informative [etc.]' 
 
 # Prior predictive checks
 
@@ -428,14 +428,23 @@ prior_draws <- trap_ppc |>
 ::: fragment
 
 ```r
+draws_to_plot <- sample(1:100, size = 4)
 prior_draws |> 
+  filter(
+    .draw %in% draws_to_plot
+  ) |> 
   ggplot(
     aes(
       x = school,
       y = .prediction
     )
   ) +
-  geom_boxplot()
+  geom_violin(
+    quantiles = c(0.5),
+    quantile.linetype = "dashed",
+    quantile.linewidth = 1
+  ) +
+  facet_wrap(vars(.draw))
 ```
 :::
 
