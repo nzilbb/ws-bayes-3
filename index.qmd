@@ -87,14 +87,17 @@ trap_sub <- qb2 |>
 
 # What's a prior?
 
-## The prior
+## The prior {.smaller}
 
 - Bayesian models start with a 'prior' distribution.
 - The prior says what results are plausible [before]{.red} we see the data.
 - A prior might be (roughly):
-    1. **uninformative**: consistent with any result,
-    2. **weakly informative**: consistent with many results,
-    3. **strongly informative**: consistent with a small range of results.
+    1. **uninformative**: doesn't push towards any result,
+    2. **weakly informative**: pushes towards plausible results but can 
+    be overcome by sufficient data,
+    3. **strongly informative**: pushes towards plausible results, essentially
+    ruling out others.
+- Strong v. weak is a continuum.
 - These are the three options relevant for reporting.
 
 ## What actually is Bayes' Theorem?
@@ -196,7 +199,7 @@ Borrow, test and modify
 ## Uninformative 
 
 - Uninformative priors let the data totally dominate.
-- `brms` default priors **tend** towards uninformative.
+- In practice are very rare (although sometimes used in `brms` defaults)
 
 ::: fragment
 
@@ -333,7 +336,7 @@ trap_fit_s <- brm(
 :::
 
 
-## Strongly informative (cont. 3)
+## Strongly informative (cont. 3) {.smaller}
 
 ::: fragment
 
@@ -344,7 +347,7 @@ rnorm(1000, mean=0, sd=0.01) |>
 ```
 :::
 
-- We're not allowing difference larger than about
+- We're not allowing differences larger than about
 0.03 in normalised space.
 - Presumably this is not actually detectable.
 

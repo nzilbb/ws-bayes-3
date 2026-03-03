@@ -254,17 +254,18 @@ Joshua Wilson Black <a href="https://orcid.org/0000-0002-8272-5763" class="quart
 <h1>What’s a prior?</h1>
 
 </section>
-<section id="the-prior" class="slide level2">
+<section id="the-prior" class="slide level2 smaller">
 <h2>The prior</h2>
 <ul>
 <li class="fragment">Bayesian models start with a ‘prior’ distribution.</li>
 <li class="fragment">The prior says what results are plausible <span class="red">before</span> we see the data.</li>
 <li class="fragment">A prior might be (roughly):
 <ol type="1">
-<li class="fragment"><strong>uninformative</strong>: consistent with any result,</li>
-<li class="fragment"><strong>weakly informative</strong>: consistent with many results,</li>
-<li class="fragment"><strong>strongly informative</strong>: consistent with a small range of results.</li>
+<li class="fragment"><strong>uninformative</strong>: doesn’t push towards any result,</li>
+<li class="fragment"><strong>weakly informative</strong>: pushes towards plausible results but can be overcome by sufficient data,</li>
+<li class="fragment"><strong>strongly informative</strong>: pushes towards plausible results, essentially ruling out others.</li>
 </ol></li>
+<li class="fragment">Strong v. weak is a continuum.</li>
 <li class="fragment">These are the three options relevant for reporting.</li>
 </ul>
 </section>
@@ -335,7 +336,7 @@ Joshua Wilson Black <a href="https://orcid.org/0000-0002-8272-5763" class="quart
 <h2>Uninformative</h2>
 <ul>
 <li class="fragment">Uninformative priors let the data totally dominate.</li>
-<li class="fragment"><code>brms</code> default priors <strong>tend</strong> towards uninformative.</li>
+<li class="fragment">In practice are very rare (although sometimes used in <code>brms</code> defaults)</li>
 </ul>
 <div class="fragment">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="fu">default_prior</span>(</span>
@@ -492,7 +493,7 @@ Joshua Wilson Black <a href="https://orcid.org/0000-0002-8272-5763" class="quart
 </div>
 </div>
 </section>
-<section id="strongly-informative-cont.-3" class="slide level2">
+<section id="strongly-informative-cont.-3" class="slide level2 smaller">
 <h2>Strongly informative (cont. 3)</h2>
 <div class="fragment">
 <div class="cell">
@@ -510,7 +511,7 @@ Joshua Wilson Black <a href="https://orcid.org/0000-0002-8272-5763" class="quart
 </div>
 </div>
 <ul>
-<li class="fragment">We’re not allowing difference larger than about 0.03 in normalised space.</li>
+<li class="fragment">We’re not allowing differences larger than about 0.03 in normalised space.</li>
 <li class="fragment">Presumably this is not actually detectable.</li>
 </ul>
 </section>
