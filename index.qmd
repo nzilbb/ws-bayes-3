@@ -1,0 +1,539 @@
+---
+title: "Bayesian Data Analysis"
+subtitle: "What Does My Model Assume?"
+# For author options see : 
+# https://quarto.org/docs/authoring/front-matter.html#authors-and-affiliations
+# NB: multiple authors can be added here.
+author:
+  - name:
+      given: Joshua
+      family: Wilson Black
+    email: joshua.black@canterbury.ac.nz
+    orcid: 0000-0002-8272-5763
+    affiliation: 
+      - "Te Kāhui Roro Reo | New Zealand Institute of Language, Brain and Behaviour"
+      - "Te Whare Wānanga o Waitaha | University of Canterbury"
+format:
+  revealjs:
+    theme: [custom.scss]
+    incremental: true
+    logo: images/NZILBB-small.svg
+    template-partials:
+      - title-slide.html
+    title-slide-attributes:
+      # If you have Marsden funding, change image name to `nzilbb-uc-marsden.svg`
+      data-background-image: images/nzilbb-uc.svg
+      # First number controls the horizontal position, second controls vertical.
+      data-background-position: '50% 5%'
+      # Controls size of image relative to width of the slide.
+      data-background-size: 70%
+    embed-resources: false
+    include-in-header:
+      - text: |
+          <link rel="icon" type="image/png" sizes="32x32" href=".//images/fav.png" />
+bibliography: 
+  - grateful-refs.bib
+editor: 
+  markdown: 
+    wrap: 72
+execute: 
+  echo: true
+knitr:
+  opts_chunk: 
+    dev: "png"
+    dev.args: 
+      bg: "transparent"
+---
+
+```{r}
+#| echo: false
+# This is a place to load packages in the background (i.e., this block won't 
+# apear on the slides because `echo` is false.)
+library(tidyverse)
+library(here)
+
+library(brms)
+
+theme_set(
+  theme_bw(base_size=20) +
+    theme(
+      panel.background = element_rect(fill = "transparent", colour = NA),
+      plot.background = element_rect(fill = "transparent", colour = NA),
+      legend.background = element_rect(fill = "transparent", colour = NA)
+    )
+)
+
+qb2 <- read_rds(here('data', 'session_1.rds'))
+
+trap_sub <- qb2 |> 
+  filter(
+    school %in% c(
+      "Avonside Girls' High School", 
+      "St Margaret's College"
+    )
+  ) |> 
+  select(
+    age, school, F1_lob2, part_id
+  )
+```
+
+# Overview
+
+## Overview
+
+1. What is a prior?
+2. Prior predictive tests
+3. Sensitivity analysis
+
+# What's a prior?
+
+## The prior
+
+- Bayesian models start with a 'prior' distribution.
+- The prior says what results are plausible [before]{.red} we see the data.
+- A prior might be (roughly):
+    1. **uninformative**: consistent with any result,
+    2. **weakly informative**: consistent with many results,
+    3. **strongly informative**: consistent with a small range of results.
+- These are the three options relevant for reporting.
+
+## What actually is Bayes' Theorem?
+
+::: {.fragment .big}
+
+$p(\theta|e) = \frac{p(e|\theta)p(\theta)}{p(e)}$
+
+:::
+
+- $p(e|\theta)$ - The [likelihood]{.red} of the evidence given the hypothesis.
+- $p(\theta)$ - The [prior]{.red} probability of the hypothesis.
+- $p(\theta|e)$ = The [posterior]{.red} probability of the hypothesis, given the
+evidence.
+- The prior and likelihood should be interpreted together.
+
+::: footer
+In practice, you can ignore $p(e)$.
+
+:::
+
+## The prior is just part of the model 
+
+- The prior captures information we have before the data (see Gelman etc.)
+- Treat it as just another part of the model.
+- Practical tests of priors:
+    - Convince yourself that it's compatible with any plausible outcome 
+    (via a [prior predictive test]{.red}).
+    - Check how much your choice influences your result 
+    (via a [prior predictive test]{.red}).
+- A terminological niggle: you can change your prior, **after** you see your data!
+
+## Probability distributions...
+
+::: r-stack
+
+:::: {.fragment .fade-in-then-out .r-fit-text}
+
+Cauchy
+
+::::
+
+:::: {.fragment .fade-in-then-out .r-fit-text}
+
+Dirichlet
+
+::::
+
+:::: {.fragment .fade-in-then-out .r-fit-text}
+
+Poisson
+
+::::
+
+:::: {.fragment .fade-in-then-out .r-fit-text}
+
+Gaussian
+
+::::
+
+:::: {.fragment .fade-in-then-out .r-fit-text}
+
+Beta
+
+::::
+
+:::: {.fragment .fade-in-then-out .r-fit-text}
+
+Gamma
+
+::::
+
+:::: {.fragment .fade-in-then-out .r-fit-text}
+
+Wishart
+
+::::
+
+:::: {.fragment .fade-in-then-out .r-fit-text}
+
+Student's $t$
+
+::::
+
+:::: {.fragment .fade-in-then-out .r-fit-text}
+
+There's no way around them...
+
+::::
+
+:::: {.fragment .fade-in-then-out .r-fit-text}
+
+Borrow, test and modify
+
+::::
+
+:::
+
+## Uninformative 
+
+- Uninformative priors let the data totally dominate.
+- `brms` default priors **tend** towards uninformative.
+
+::: fragment
+
+```r
+default_prior(
+    F1_lob2 ~ school,  
+    data = trap_sub
+)
+```
+:::
+
+## Uninformative
+
+```{r}
+#| echo: false
+default_prior(
+    F1_lob2 ~ school,  
+    data = trap_sub
+  ) |> 
+  tibble() |> 
+  select(prior, class, coef) |> 
+  mutate(
+    prior = if_else(prior == "", "(flat)", prior)
+  ) |> 
+  knitr::kable()
+```
+
+- `(flat)` indicates an uninformative prior.
+- `student_t(...)`, on intercept and variance, is weakly informative. 
+
+
+## Weakly informative
+
+::: fragment
+```{r}
+#| output-location: fragment
+rstudent_t(n=1000, 3, 0.4, 2.5) |> 
+  hist()
+``` 
+
+:::
+
+## Weakly informative (cont.) {.smaller}
+
+::: columns
+
+:::: {.column width="25%"}
+- The intercept prior is centred on the mean F1,
+- The variance is also estimated from the data.
+- It's compatible with a very wide range of plausible results.
+::::
+
+:::: {.column width="75%"}
+```{r}
+#| echo: false
+rstudent_t(n=1000, 3, 0.4, 2.5) |> 
+  hist()
+``` 
+::::
+
+:::
+
+- But *not* with, e.g., an intercept of 2000.
+- Weakly informative priors are typically the best choice.
+- **NB:** `brms` defaults use the data to estimate the prior.
+
+## Weakly informative (cont. 2)
+
+- Informativeness is a continuum.
+- Let's be more informative...
+
+::: fragment
+```{r}
+trap_prior <- c(
+  prior(student_t(3, 0, 2), class = "Intercept"),
+  prior(normal(0, 2), class = "sigma"),
+  prior(normal(0, 0.5), class = "b")
+)
+```
+
+:::
+
+::: fragment
+```{r}
+#| cache: true
+#| output: false
+trap_fit_b <- brm(
+  F1_lob2 ~ school,  
+  data = trap_sub,
+  prior = trap_prior
+)
+```
+
+:::
+
+## Weakly informative (cont. 3) {.smaller}
+
+::: fragment
+
+> We fit a Bayesian linear regression with weakly informative priors using the `brms` pakage. The intercept, representing the mean F1 for Avonside students, has a weakly informative Student t distribution (df=3, mean=0, scale=2) with moderately
+heavy atails. The difference between Avonside and 
+St Margarets has a normal (mean=0, sd=0.5) prior, which expresses the expectation that the students come from the same dialect and that their mean 
+[trap]{.smallcaps} F1 is very unlikely to be more than 1 point different in Lobanov normalised space.
+The prior on residual standard deviation is normal (mean=0, sd=2), accomodating a wide range of variation with Lobanov normalised formant values.
+:::
+
+## Strongly informative
+
+- Our weakly informative prior was based on readily available information about, e.g.,
+Lobanov normalised formant values.
+- We might want to add new data to our existing model.
+- We might have some other source on information.
+- This can be done using 'strongly informative' priors.
+
+## Strongly informative (cont. 2)
+
+- Here's a strong **and false** prior.
+
+::: fragment
+```{r}
+#| cache: true
+#| output: false
+bad_prior <- c(
+  prior(student_t(3, 0, 2), class = "Intercept"),
+  prior(normal(0, 2), class = "sigma"),
+  prior(normal(0, 0.01), class = "b")
+)
+trap_fit_s <- brm(
+  F1_lob2 ~ school,  
+  data = trap_sub,
+  prior = bad_prior
+)
+```
+:::
+
+
+## Strongly informative (cont. 3)
+
+::: fragment
+
+```{r}
+#| output-location: fragment
+rnorm(1000, mean=0, sd=0.01) |> 
+  hist()
+```
+:::
+
+- We're not allowing difference larger than about
+0.03 in normalised space.
+- Presumably this is not actually detectable.
+
+## Strongly informative (cont. 4) {.smaller}
+
+::: fragment
+```{r}
+fixef(trap_fit_s)
+```
+:::
+
+::: fragment
+
+vs.
+
+:::
+
+::: fragment
+```{r}
+fixef(trap_fit_b)
+```
+:::
+
+- Our prior expectation on the size of the difference
+between schools has messed up both the intercept (Avondside) _and_ the St Margaret's coefficients.
+
+## A rule
+
+::: {.fragment .r-fit-text}
+Explicitly specify your prior!
+:::
+
+- Don't use the default without thinking
+- If you do decide to use the default, put it in your code explicitly.
+    - i.e., not 'we used the default prior',
+    - rather, 'use used an uninformative prior for all coefficients, with a weakly informative [etc.]' 
+
+# Prior predictive checks
+
+## The idea
+
+- Last week we drew from the posterior distribution.
+- We can also draw from the prior and see what comes
+out (using the likelihood).
+- Easy to do with `brms`.
+- If the values are implausibly wide, we can narrow the prior (and vice versa)
+
+## Implementation
+
+::: fragment
+```{r}
+#| cache: true
+#| output: false
+#| code-line-numbers: |5
+trap_ppc <- brm(
+  F1_lob2 ~ school,  
+  data = trap_sub,
+  prior = trap_prior,
+  sample_prior = "only"
+)
+```
+:::
+
+## Sampling
+
+::: fragment
+```{r}
+library(tidybayes)
+prior_draws <- trap_ppc |>
+  predicted_draws(newdata = trap_sub, ndraws = 100)
+```
+
+:::
+
+## Plotting
+
+::: fragment
+
+```r
+prior_draws |> 
+  ggplot(
+    aes(
+      x = school,
+      y = .prediction
+    )
+  ) +
+  geom_boxplot()
+```
+:::
+
+## Plotting (cont. 2) {.smaller}
+
+::: columns
+:::: {.column width="70%"}
+
+```{r}
+#| echo: false
+prior_draws |> 
+  ggplot(
+    aes(
+      x = school,
+      y = .prediction
+    )
+  ) +
+  geom_violin()
+```
+
+::::
+
+:::: {.column width="30%"}
+- Bulk sitting in plausible values
+- Outliers are a bit excessive 
+- We could tighten this up if we wanted
+- In more complex models, this is more useful!
+::::
+
+:::
+
+- Note that this wouldn't reveal problem in the strong prior above.
+- Just looking at a N(0, 0.01) distribution would be enough.
+
+# Sensitivity analysis
+
+## The idea
+
+- Try some other priors, see how much it affects the results.
+- I'd always do a prior predictive check, but only do a sensitivity analysis if I were worried.
+
+## Automate {.smaller}
+
+- The `priorsense` package is an option [@priorsense2023].
+
+::: fragment
+```{r}
+#| output-location: fragment
+library(priorsense)
+powerscale_sensitivity(trap_fit_b)
+```
+:::
+
+
+
+## Automate (cont. 2) {.smaller}
+
+::: fragment
+
+```{r}
+#| output-location: fragment
+powerscale_plot_dens(trap_fit_b)
+```
+:::
+
+## Automate (cont. 3) {.smaller}
+
+::: fragment
+
+```{r}
+#| output-location: fragment
+powerscale_sensitivity(trap_fit_s)
+```
+:::
+
+# Summary {.smaller}
+
+## Summary
+
+1. What is a prior?
+    - incl. uninformative, weakly informative, or strongly informative.
+2. Prior predictive tests
+    - i.e. what possibilities is my prior consistent with?
+3. Sensitivity analysis
+    - i.e. what are the consequences of changing the prior for my results?
+
+## Now and next time
+
+- Download GitHub repository: <https://github.com/nzilbb/ws-bayes-3>
+- Work through `analysis.R`
+- Next time: Is this thing healthy?
+
+# References
+
+```{r}
+#| echo: false
+grateful::nocite_references(
+  grateful::cite_packages(output = "citekeys", out.dir = here())
+)
+```
+
+
+::: refs
+
+:::
