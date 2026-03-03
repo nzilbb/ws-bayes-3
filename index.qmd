@@ -33,6 +33,7 @@ format:
           <link rel="icon" type="image/png" sizes="32x32" href=".//images/fav.png" />
 bibliography: 
   - grateful-refs.bib
+  - stat_workshops.bib
 editor: 
   markdown: 
     wrap: 72
@@ -121,7 +122,7 @@ In practice, you can ignore $p(e)$.
 
 ## The prior is just part of the model 
 
-- The prior captures information we have before the data (see Gelman etc.)
+- The prior captures information we have before the data [see @gelmanSubjectiveObjectiveStatistics2017a]
 - Treat it as just another part of the model.
 - Practical tests of priors:
     - Convince yourself that it's compatible with any plausible outcome 
