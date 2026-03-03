@@ -445,14 +445,23 @@ prior_draws |>
 
 ```{r}
 #| echo: false
+draws_to_plot <- sample(1:100, size = 4)
 prior_draws |> 
+  filter(
+    .draw %in% draws_to_plot
+  ) |> 
   ggplot(
     aes(
       x = school,
       y = .prediction
     )
   ) +
-  geom_violin()
+  geom_violin(
+    quantiles = c(0.5),
+    quantile.linetype = "dashed",
+    quantile.linewidth = 1
+  ) +
+  facet_wrap(vars(.draw))
 ```
 
 ::::
@@ -466,8 +475,7 @@ prior_draws |>
 
 :::
 
-- Note that this wouldn't reveal problem in the strong prior above.
-- Just looking at a N(0, 0.01) distribution would be enough.
+- We're plotting 'draws' separately. 
 
 # Sensitivity analysis
 
